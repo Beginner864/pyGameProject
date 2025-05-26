@@ -19,7 +19,7 @@ class Bullet(pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect(center=(x, y))
 
-    def update(self, dt, ground_group):
+    def update(self, dt, ground_group):  # 여기서 ground_group이 실제로는 collision_rects를 의미
         if self.direction == "right":
             self.rect.x += self.speed * dt
         elif self.direction == "left":
@@ -29,15 +29,15 @@ class Bullet(pygame.sprite.Sprite):
         elif self.direction == "down":
             self.rect.y += self.speed * dt
 
-        # 그룹 충돌
-        for ground in ground_group:
-            if self.rect.colliderect(ground.rect):
-                #print("총알이 땅에 바로 부딪혀서 삭제됨!")
+        # 충돌 판정
+        for rect in ground_group:
+            if self.rect.colliderect(rect):
                 self.active = False
                 break
 
-        if (self.rect.right < 0 or self.rect.left > 1280 or
-            self.rect.bottom < 0 or self.rect.top > 1080):
+        # 화면 밖으로 나가면 비활성화
+        if (self.rect.right < 0 or self.rect.left > 2000 or
+            self.rect.bottom < 0 or self.rect.top > 2000):
             self.active = False
 
     def draw(self, screen):

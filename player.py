@@ -238,7 +238,7 @@ class Player(pygame.sprite.Sprite):
 
 
     # 점프 중이거나 바닥이 아닐 때 중력을 적용해서 낙하하도록 하는 함수
-    def apply_gravity(self, tile_group):
+    def apply_gravity(self, collision_rects):
 
         # 바닥일때는 중력 가속도 x
         if self.on_ground and self.velocity_y == 0:
@@ -249,15 +249,11 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = round(self.pos_y)
 
         # 충돌 체크
-        hits = pygame.sprite.spritecollide(self, tile_group, False)
-        for tile in hits:
-            if self.velocity_y >= 0 and self.rect.colliderect(tile.rect):
-                self.rect.bottom = tile.rect.top
+        for rect in collision_rects:
+            if self.velocity_y >= 0 and self.rect.colliderect(rect):
+                self.rect.bottom = rect.top
                 self.pos_y = self.rect.y
-
-                #if abs(self.velocity_y) < 1: 
                 self.velocity_y = 0
-
                 self.jump_count = 2
                 self.on_ground = True
                 break
@@ -265,12 +261,12 @@ class Player(pygame.sprite.Sprite):
             self.on_ground = False
         
 
-    def update(self, keys, dt, tile_group):
+    def update(self, keys, dt, collision_rects):
         self.dt = dt # 현재 프레임 시간 저장
         prev_state = self.state # 이전 상태 저장
         prev_on_ground = self.on_ground
 
-        self.apply_gravity(tile_group)
+        self.apply_gravity(collision_rects)
         
         self.handle_input(keys)
 
@@ -298,7 +294,7 @@ class Player(pygame.sprite.Sprite):
 
         
 
-        self.bullets.update(dt, tile_group)
+        self.bullets.update(dt, collision_rects)
         for bullet in list(self.bullets):
             if not bullet.active:
                 self.bullets.remove(bullet)
@@ -336,21 +332,21 @@ class Player(pygame.sprite.Sprite):
         #if self.rect.y > 1080:
             #print("주의 : 캐릭터 화면 아래로 사라짐!", self.rect.y)
 
-    def draw(self,screen):
+    def draw(self, screen):
         frame_list = self.animations.get(self.state, self.animations["idle"])
         frame = frame_list[self.current_frame % len(frame_list)]
-
-
         frame_rect = frame.get_rect()
 
-        # 좌우 반전 처리
         if self.direction == "left":
             frame = pygame.transform.flip(frame, True, False)
-              
+
         frame_x = self.rect.centerx - frame_rect.width
         frame_y = self.rect.bottom - frame_rect.height
 
         screen.blit(frame, (frame_x, frame_y))
 
-        self.bullets.draw(screen)
+        # 총알도 오프셋 고려해서 출력
+        for bullet in self.bullets:
+            bullet.draw(screen)
+
 

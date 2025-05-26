@@ -6,5 +6,5 @@ class Tile(pygame.sprite.Sprite):
         self.image = image
         self.rect = image.get_rect(topleft=(x,y))
 
-    def draw(self, screen):
+    def draw(self, screen, offset_x = 0, offset_y = 0):
         screen.blit(self.image, self.rect)
