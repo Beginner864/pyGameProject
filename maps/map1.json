@@ -1,0 +1,10 @@
+{
+  "background": "nightCastle.png",
+  "tile_image": "nightCastleTile.png",
+  "tile_positions": [
+    [0, 958],
+    [314, 958],
+    [628, 958],
+    [1256, 958]
+  ]
+}
